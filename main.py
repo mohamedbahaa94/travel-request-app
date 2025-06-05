@@ -3,20 +3,18 @@ from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
-def send_travel_request_email(summary, receiver_email):
+def send_travel_request_email(summary, receiver_emails):
     SENDER_EMAIL = "mohamed.bahaa.saadawy@gmail.com"
     SENDER_PASSWORD = "jjbm hvni xltv ucqw"
     SMTP_SERVER = "smtp.gmail.com"
     SMTP_PORT = 587
 
     subject = "New Travel Request Submitted"
-    # Format summary for email (simple text, or you can use HTML)
     body = f"New travel request received:\n\n{summary}"
 
     msg = MIMEMultipart()
     msg["From"] = SENDER_EMAIL
-    msg["To"] = receiver_email
+    msg["To"] = ", ".join(receiver_emails)
     msg["Subject"] = subject
     msg.attach(MIMEText(body, "plain"))
 
@@ -24,7 +22,7 @@ def send_travel_request_email(summary, receiver_email):
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
-        server.sendmail(SENDER_EMAIL, receiver_email, msg.as_string())
+        server.sendmail(SENDER_EMAIL, receiver_emails, msg.as_string())
         server.quit()
         return True
     except Exception as e:
@@ -243,8 +241,8 @@ if st.button("Submit Request", key="submit_request_button"):
     summary_text = json.dumps(summary_dict, indent=2, default=str)
 
     # === Send Email ===
-    RECEIVER_EMAIL = "mohamed.bahaa@paxerahealth.com"
-    sent = send_travel_request_email(summary_text, RECEIVER_EMAIL)
+    RECEIVER_EMAILS = ["mohamed.bahaa@paxerahealth.com", "alia.zahran@paxerahealth.com"]
+    sent = send_travel_request_email(summary_text, RECEIVER_EMAILS)
     if sent:
         st.success("Email sent to travel admin!")
     else:
